@@ -23,7 +23,7 @@ function exportWeightPDF(){
       records.map(function(r){var v=r.vals[idx];if(v===undefined||v===null||v==='')return '<td style="border:1px solid #ccc"></td>';var num=parseFloat(v);var p=recTarget(r);var col=!p?'#111':((!isNaN(num)&&num>=p.min&&num<=p.max)?'#16a34a':'#dc2626');return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;color:'+col+'">'+num.toFixed(3)+'</td>'}).join('')+'</tr>';
   }
   var compCells=records.map(function(r){var col=(r.compliance==null||r.compliance>=80)?'#16a34a':'#dc2626';return '<td style="border:1px solid #ccc;text-align:center;font-weight:700;color:'+col+';padding:4px">'+compLabel(r.compliance)+'</td>'}).join('');
-  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10px;color:#111;padding:16px}table{font-size:9px}</style></head><body>'+
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10px;color:#111;padding:16px}table{font-size:9px}@page{size:portrait;margin:0}@media print{body{padding:14mm}}</style></head><body>'+
   '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #c8102e;padding-bottom:10px;margin-bottom:12px">'+
     '<div><img src="'+LOGO+'" style="height:48px;object-fit:contain"><br><span style="font-size:8px;color:#777">1931/1935/1945 N 15th Ave, Melrose Park, IL 60160</span></div>'+
     '<div style="text-align:right;font-size:9px;color:#555">SQF # 2.4.D.1.1 LeakPointer H2O Quality Check Log<br>Revision: 01/20/25 | Supersedes: 08/21/24</div>'+
@@ -110,7 +110,7 @@ function exportGmpPDF(){
       '<td style="border:1px solid #ccc;padding:5px;text-align:center;font-size:14px;width:60px">'+yBox+' Yes</td>'+
       '<td style="border:1px solid #ccc;padding:5px;text-align:center;font-size:14px;width:60px">'+nBox+' No</td></tr>';
   }).join('');
-  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10px;color:#111;padding:20px}table{width:100%;border-collapse:collapse}th{border:1px solid #999;padding:5px 8px;background:#f0f0f0;font-size:10px;text-align:center}td{border:1px solid #ccc;padding:4px 8px;font-size:10px}</style></head><body>'+
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10px;color:#111;padding:20px}table{width:100%;border-collapse:collapse}th{border:1px solid #999;padding:5px 8px;background:#f0f0f0;font-size:10px;text-align:center}td{border:1px solid #ccc;padding:4px 8px;font-size:10px}@page{size:portrait;margin:0}@media print{body{padding:14mm}}</style></head><body>'+
   '<div style="display:flex;justify-content:space-between;font-size:9px;color:#555;margin-bottom:10px"><span>SQF # 2.5.D Internal Audits and Inspections</span><span style="text-decoration:underline">Document: 2.5.D.A Daily GMP Facility Audit</span></div>'+
   '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
     '<div style="display:flex;align-items:center;gap:14px"><img src="'+LOGO+'" style="height:52px;object-fit:contain"><div style="font-size:9px;color:#555;line-height:1.7">1931 N 15th Ave<br>1935 N 15th Ave<br>1945 N 15th Ave<br>Melrose Park, IL.</div></div>'+

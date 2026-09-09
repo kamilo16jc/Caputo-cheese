@@ -48,10 +48,10 @@ function exportDailyShiftPDF(){
   '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+shiftLabel+' Report '+esc(date)+'</title><style>'+
     '*{box-sizing:border-box}'+
     'body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:'+body+';font-size:10px;margin:0;padding:24px 28px}'+
-    '@page{size:portrait;margin:14mm}'+
+    '@page{size:portrait;margin:0}'+
     'h1{font-size:16px;color:'+ink+';margin:0;font-weight:800}'+
     '.savebtn{position:fixed;top:14px;right:16px;background:'+ink+';color:#fff;border:0;border-radius:6px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}'+
-    '@media print{body{padding:0}.savebtn{display:none}}'+
+    '@media print{body{padding:14mm}.savebtn{display:none}}'+
   '</style></head><body>'+
   '<button class="savebtn" onclick="window.print()">Save as PDF</button>'+
 
@@ -109,10 +109,10 @@ function exportShiftPDF(id){
   '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+esc(rec.reportNumber||'Shift Report')+'</title><style>'+
     '*{box-sizing:border-box}'+
     'body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:'+body+';font-size:10px;margin:0;padding:24px 28px}'+
-    '@page{size:portrait;margin:14mm}'+
+    '@page{size:portrait;margin:0}'+
     'h1{font-size:15px;color:'+ink+';margin:0;font-weight:800}'+
     '.savebtn{position:fixed;top:14px;right:16px;background:'+ink+';color:#fff;border:0;border-radius:6px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}'+
-    '@media print{body{padding:0}.savebtn{display:none}}'+
+    '@media print{body{padding:14mm}.savebtn{display:none}}'+
   '</style></head><body>'+
   '<button class="savebtn" onclick="window.print()">Save as PDF</button>'+
 

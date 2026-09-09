@@ -330,13 +330,13 @@ function exportDashPDF(){
     '*{box-sizing:border-box}'+
     'body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:'+DP.body+
       ';font-size:10px;margin:0;padding:22px 26px;background:#fff}'+
-    '@page{size:portrait;margin:12mm}'+
+    '@page{size:portrait;margin:0}'+
     'h1{font-size:19px;color:'+DP.ink+';margin:0;font-weight:800;letter-spacing:-0.02em}'+
     'img{max-width:100%}'+
     '.savebtn{position:fixed;top:14px;right:16px;z-index:9;background:'+DP.ink+';color:#fff;border:0;'+
       'border-radius:6px;padding:9px 16px;font-size:12px;font-weight:700;cursor:pointer;'+
       'font-family:inherit;box-shadow:0 2px 8px rgba(0,0,0,0.18)}'+
-    '@media print{body{padding:0}.savebtn{display:none}}'+
+    '@media print{body{padding:12mm}.savebtn{display:none}}'+
   '</style></head><body>'+
   '<button class="savebtn" onclick="window.print()">Save as PDF</button>'+
 
