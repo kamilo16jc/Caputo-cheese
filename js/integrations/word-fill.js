@@ -129,6 +129,8 @@ function sendWeightSealForm(){
 
   // Campos pre-calculados para que el mapeo del Word template sea directo
   var weights = rptWeightResults.map(function(r){
+    // Issue de línea: "Issue" ya va en pkgLabel; total y promedio quedan vacíos
+    if(r.issue) return Object.assign({}, r, { sum:'', avgR:'' });
     var sum = (r.vals||[]).reduce(function(a,b){ return a + (parseFloat(b)||0); }, 0);
     return Object.assign({}, r, {
       sum:  Math.round(sum*100)/100,

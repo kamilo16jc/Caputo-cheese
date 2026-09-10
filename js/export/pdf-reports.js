@@ -9,7 +9,7 @@ function exportWeightPDF(){
   var shiftVal=st.shift?(st.shift===1?'1st':'2nd'):'___';
   // Los registros sin target no cuentan para el compliance (no hay contra qué medirlos)
   var scored=db.weights.filter(function(r){ return r.compliance!=null; });
-  var noTarget=db.weights.length-scored.length;
+  var noTarget=db.weights.filter(function(r){ return !r.issue && r.compliance==null; }).length;
   var tBags=scored.reduce(function(a,r){return a+r.total},0);
   var tPass=scored.reduce(function(a,r){return a+r.pass},0);
   var tFail=tBags-tPass;
@@ -22,7 +22,7 @@ function exportWeightPDF(){
     return '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px;white-space:nowrap">'+label+'</td>'+
       records.map(function(r){var v=r.vals[idx];if(v===undefined||v===null||v==='')return '<td style="border:1px solid #ccc"></td>';var num=parseFloat(v);var p=recTarget(r);var col=!p?'#111':((!isNaN(num)&&num>=p.min&&num<=p.max)?'#16a34a':'#dc2626');return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;color:'+col+'">'+num.toFixed(3)+'</td>'}).join('')+'</tr>';
   }
-  var compCells=records.map(function(r){var col=(r.compliance==null||r.compliance>=80)?'#16a34a':'#dc2626';return '<td style="border:1px solid #ccc;text-align:center;font-weight:700;color:'+col+';padding:4px">'+compLabel(r.compliance)+'</td>'}).join('');
+  var compCells=records.map(function(r){if(r.issue)return '<td style="border:1px solid #ccc;text-align:center;padding:4px"></td>';var col=(r.compliance==null||r.compliance>=80)?'#16a34a':'#dc2626';return '<td style="border:1px solid #ccc;text-align:center;font-weight:700;color:'+col+';padding:4px">'+compLabel(r.compliance)+'</td>'}).join('');
   var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;font-size:10px;color:#111;padding:16px}table{font-size:9px}@page{size:portrait;margin:0}@media print{body{padding:14mm}}</style></head><body>'+
   '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #c8102e;padding-bottom:10px;margin-bottom:12px">'+
     '<div><img src="'+LOGO+'" style="height:48px;object-fit:contain"><br><span style="font-size:8px;color:#777">1931/1935/1945 N 15th Ave, Melrose Park, IL 60160</span></div>'+
@@ -37,12 +37,12 @@ function exportWeightPDF(){
   '<tr><th '+thr+'>PACKAGE WEIGHT</th>'+records.map(function(r){return '<th '+th+'>'+r.pkgLabel+'</th>'}).join('')+'</tr>'+
   '<tr><th '+thr+'>TIME</th>'+records.map(function(r){return '<th '+th+'>'+(r.time||'—')+'</th>'}).join('')+'</tr>'+
   '</thead><tbody>'+
-  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px;white-space:nowrap">DESCRIPTION</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-size:8px">'+(r.productName||'—')+'</td>'}).join('')+'</tr>'+
+  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px;white-space:nowrap">DESCRIPTION</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-size:8px">'+(r.issue?(WEIGHT_ISSUES[r.issue]?WEIGHT_ISSUES[r.issue].label:'Issue'):(r.productName||'—'))+'</td>'}).join('')+'</tr>'+
   '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px;white-space:nowrap">TARGET (LBS)</td>'+records.map(function(r){var t=recTarget(r);return '<td style="border:1px solid #ccc;text-align:center;font-size:8px">'+(t?t.min+' – '+t.max:'not set')+'</td>'}).join('')+'</tr>'+
   '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px;white-space:nowrap">BAGS / CASE</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-size:8px">'+(r.bagsPerCase||'—')+'</td>'}).join('')+'</tr>'+
   sRow('Sample 1',0)+sRow('Sample 2',1)+sRow('Sample 3',2)+sRow('Sample 4',3)+sRow('Sample 5',4)+
-  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">TOTAL</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;background:#fafff8">'+r.total+'</td>'}).join('')+'</tr>'+
-  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">AVERAGE</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;background:#fafff8">'+parseFloat(r.avg).toFixed(3)+'</td>'}).join('')+'</tr>'+
+  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">TOTAL</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;background:#fafff8">'+(r.issue?'':r.total)+'</td>'}).join('')+'</tr>'+
+  '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">AVERAGE</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center;font-weight:600;background:#fafff8">'+((r.issue||r.avg==null)?'':parseFloat(r.avg).toFixed(3))+'</td>'}).join('')+'</tr>'+
   '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">COMPLIANCE</td>'+compCells+'</tr>'+
   '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">LOT</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center">'+(r.lot||'')+'</td>'}).join('')+'</tr>'+
   '<tr><td style="border:1px solid #ccc;font-weight:700;background:#f5f5f5;padding:4px 8px">INITIALS</td>'+records.map(function(r){return '<td style="border:1px solid #ccc;text-align:center">'+(r.initials||'')+'</td>'}).join('')+'</tr>'+

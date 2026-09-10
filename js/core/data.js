@@ -12,6 +12,28 @@ var PKGS = [
   {label:'8 oz',    min:0.466, max:0.527}
 ];
 var SEAL_CHECKS = ['Visual','Dunk Tank','Printing'];
+
+// Estados de la línea en Weights. "running" = normal (se toman pesos). Los otros
+// tres registran un "issue" (con hora y comentario) porque no se pudo pesar; no
+// llevan peso ni compliance y se excluyen del Dashboard.
+var WEIGHT_ISSUES = {
+  labeling: { label:'Labeling',  note:'Line stopped for labeling', comment:'Line stopped for labeling — weights not taken' },
+  break:    { label:'On break',  note:'Line on break',            comment:'Line on break — weights not taken' },
+  down:     { label:'Line down', note:'Line down',                comment:'Line down — weights not taken' }
+};
+// "HH:MM" (24h) -> "h:MM AM/PM" para el comentario del issue
+function fmtTime12(t){
+  if(!t || String(t).indexOf(':')<0) return t||'';
+  var p=String(t).split(':'), h=parseInt(p[0],10), m=p[1];
+  if(isNaN(h)) return t;
+  var ap=h>=12?'PM':'AM', h12=h%12; if(h12===0) h12=12;
+  return h12+':'+m+' '+ap;
+}
+// Comentario por defecto del issue, con la hora incluida
+function weightIssueComment(issue, time){
+  var info = WEIGHT_ISSUES[issue]; if(!info) return '';
+  return info.comment + (time ? ' ('+fmtTime12(time)+')' : '');
+}
 // Minutos dentro de los cuales dos registros de la misma línea se consideran
 // sospechosos (el operador olvidó cambiar la línea al pasar a otra máquina).
 var DUP_WINDOW_MIN = 20;
@@ -95,7 +117,7 @@ var LOGO_LIGHT='data:image/svg+xml;utf8,'+encodeURIComponent(LOGO_SVG.replace('#
 
 // ===== STATE =====
 // customPkg: peso que viene de un producto del catálogo y no está en PKGS
-var st = {line:null, shift:null, pkg:null, customPkg:null, samples:['','','','',''], sealChecks:{}};
+var st = {line:null, shift:null, pkg:null, customPkg:null, samples:['','','','',''], sealChecks:{}, wIssue:null};
 var gmpAnswers = {};
 var gmpShift = null;
 var metalAnswers = {};

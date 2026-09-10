@@ -12,7 +12,39 @@ function initWeight(){
   if(currentUser) document.getElementById('w-initials').value = getInitials();
   renderProductOptions('w-product-list');
   onProductInput('weight');
-  updateDupHint();
+  var ws=document.getElementById('w-status'); if(ws) ws.value='running';
+  setWeightStatus('running');   // arranca en modo normal (llama a updateDupHint)
+}
+
+// ===== LINE STATUS (Running / Labeling / On break / Line down) =====
+// Con un issue no se toman pesos: se ocultan los campos de peso y se registra
+// la hora + un comentario por defecto.
+function setWeightStatus(v){
+  st.wIssue = (v==='running') ? null : v;
+  var isIssue = !!st.wIssue;
+  var top = document.getElementById('w-weight-top');
+  var bot = document.getElementById('w-weight-bottom');
+  if(top) top.style.display = isIssue ? 'none' : '';
+  if(bot) bot.style.display = isIssue ? 'none' : '';
+  var banner = document.getElementById('w-issue-banner');
+  var btn = document.querySelector('#screen-weight .main-btn');
+  if(isIssue){
+    var info = WEIGHT_ISSUES[st.wIssue];
+    if(banner){
+      banner.style.display='block';
+      banner.innerHTML = '<div class="dup-hint-title">'+info.note+'</div>'+
+        '<div class="dup-hint-detail">Logging an issue — no weights recorded. The time and comment go into the log.</div>';
+    }
+    var c = document.getElementById('w-comments');
+    if(c) c.value = weightIssueComment(st.wIssue, document.getElementById('check-time').value);
+    if(btn) btn.textContent = 'Log Issue';
+    var dh = document.getElementById('w-dup-hint'); if(dh) dh.style.display='none';
+  } else {
+    if(banner) banner.style.display='none';
+    var c2 = document.getElementById('w-comments'); if(c2) c2.value='';
+    if(btn) btn.textContent = 'Save Record';
+    updateDupHint();
+  }
 }
 
 // Peso activo: uno de la lista PKGS o el del producto si no está en la lista.
@@ -161,7 +193,9 @@ function weightCheckTime(){
 }
 
 function findRecentWeight(){
-  return findRecentForLine(getDB().weights, st.line, weightCheckTime());
+  // Los issues no son pesos: no deben disparar la alerta de duplicidad
+  var real = getDB().weights.filter(function(r){ return !r.issue; });
+  return findRecentForLine(real, st.line, weightCheckTime());
 }
 
 function dupWeightTitle(d){
@@ -175,11 +209,18 @@ function dupWeightDetail(d){
 }
 
 function updateDupHint(){
+  // En modo issue no hay chequeo de duplicidad; refresca el comentario con la hora
+  if(st.wIssue){
+    var c=document.getElementById('w-comments');
+    if(c) c.value = weightIssueComment(st.wIssue, document.getElementById('check-time').value);
+    return;
+  }
   var d=findRecentWeight();
   renderDupHint('w-dup-hint', d?dupWeightTitle(d):'', d?dupWeightDetail(d):'');
 }
 
 function saveWeight(){
+  if(st.wIssue){ commitWeightIssue(); return; }   // línea parada: registra el issue
   if(!st.line||!st.shift){toast('Select line & shift first');return}
   if(!activePkg()){toast('Select package size');return}
   var vals=st.samples.map(function(v){return parseFloat(v)}).filter(function(v){return !isNaN(v)});
@@ -238,5 +279,43 @@ function commitWeight(){
   if(rec.pass!=null && rec.pass < rec.total) playAlert('fail'); else playAlert('pass');
   toast('Record saved!');
   updateDupHint();
+}
+
+// Registra un issue de línea (Labeling / On break / Line down) en vez de un peso.
+// "Issue" va en el campo de package (arriba), la hora en time y el comentario
+// (con la hora) abajo. No cuenta para compliance ni aparece en el Dashboard.
+function commitWeightIssue(){
+  if(!st.line||!st.shift){ toast('Select line & shift first'); return; }
+  var issue = st.wIssue;
+  var info  = WEIGHT_ISSUES[issue];
+  var timeVal = document.getElementById('check-time').value;
+  var comment = document.getElementById('w-comments').value.trim() || weightIssueComment(issue, timeVal);
+  var db = getDB();
+  db.weights.push({
+    id: Date.now(),
+    date: isoFromDateTime(document.getElementById('w-date').value, timeVal),
+    line: st.line, shift: st.shift,
+    issue: issue,
+    pkg: null, pkgLabel: 'Issue',
+    vals: [], avg: null, pass: null, total: 0, compliance: null,
+    time: timeVal,
+    lot: '', product: '', productName: '', bagsPerCase: null,
+    comments: comment,
+    initials: document.getElementById('w-initials').value,
+    target: {min:null, max:null}
+  });
+  saveDB(db);
+  var rec = db.weights[db.weights.length-1];
+  if(window.saveToFirebase) window.saveToFirebase('weights', rec);
+  logActivity('weight','Line issue logged',
+    'Line '+rec.line+' · '+info.label+' · '+(rec.time||'—'),
+    rec.initials||(currentUser?currentUser.name:'—'));
+  document.getElementById('w-comments').value='';
+  document.getElementById('w-initials').value='';
+  playAlert('pass');
+  toast(info.label+' logged');
+  // vuelve a modo normal para el próximo registro
+  var ws=document.getElementById('w-status'); if(ws) ws.value='running';
+  setWeightStatus('running');
 }
 

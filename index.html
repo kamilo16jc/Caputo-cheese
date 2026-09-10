@@ -173,6 +173,15 @@
     <option value="1">1st Shift</option>
     <option value="2">2nd Shift</option>
   </select></div>
+  <div class="sec-label">Line Status</div>
+  <div class="select-wrap"><select class="field" id="w-status" onchange="setWeightStatus(this.value)">
+    <option value="running">Running — taking weights</option>
+    <option value="labeling">Labeling — line stopped</option>
+    <option value="break">On break</option>
+    <option value="down">Line down</option>
+  </select></div>
+  <div class="dup-hint" id="w-issue-banner" style="display:none"></div>
+  <div id="w-weight-top">
   <div class="sec-label">Product Number</div>
   <div class="prod-row">
     <input type="text" class="field" id="w-product" list="w-product-list" placeholder="Type or scan the product number"
@@ -195,11 +204,13 @@
       <div class="target-val" id="time-val">—</div>
     </div>
   </div>
+  </div><!-- /w-weight-top -->
   <div class="sec-label">Time of Check</div>
   <div class="time-row">
     <input type="time" class="time-input" id="check-time">
     <button class="now-btn" onclick="setNow()">Now</button>
   </div>
+  <div id="w-weight-bottom">
   <div class="sec-label">Samples (LBS)</div>
   <div class="samples-wrap" id="samples-wrap"></div>
   <div class="stats-row">
@@ -214,6 +225,7 @@
   </div>
   <div class="sec-label">LOT Number</div>
   <input type="text" class="field" id="w-lot" placeholder="Enter LOT number">
+  </div><!-- /w-weight-bottom -->
   <div class="sec-label">Comments</div>
   <textarea class="field" id="w-comments" placeholder="Comments or corrective actions..." rows="3"></textarea>
   <div class="sec-label">Operator Initials</div>

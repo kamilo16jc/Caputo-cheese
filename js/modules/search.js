@@ -444,7 +444,7 @@ function weightPanel(list){
       '<td>'+(w.shift===1?'1st':'2nd')+'</td>'+
       '<td class="mono code">'+esc((w.lot||'—'))+'</td>'+
       '<td class="mono">'+esc((w.product||'—'))+'</td>'+
-      '<td class="mono">'+esc((w.pkgLabel||'—'))+'</td>'+
+      '<td class="mono">'+esc(w.issue&&WEIGHT_ISSUES[w.issue]?('Issue · '+WEIGHT_ISSUES[w.issue].label):(w.pkgLabel||'—'))+'</td>'+
       '<td class="samples">'+(samples||'—')+'</td>'+
       '<td class="mono num">'+(w.avg!=null?parseFloat(w.avg).toFixed(3):'—')+'</td>'+
       '<td class="num"><span class="pill '+cls+'">'+compLabel(w.compliance)+'</span></td>'+

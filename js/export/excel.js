@@ -16,9 +16,11 @@ function exportRptExcel() {
     var dt = r.date ? new Date(r.date).toLocaleDateString('en-US') : '';
     return [
       dt, r.time||'', 'Line '+r.line, (r.shift===1?'1st':'2nd')+' Shift',
-      r.pkgLabel, targetLabel(r), r.product||'', r.productName||'', r.bagsPerCase||'', r.lot||'',
+      r.pkgLabel, targetLabel(r), r.product||'',
+      (r.issue && WEIGHT_ISSUES[r.issue] ? WEIGHT_ISSUES[r.issue].label : (r.productName||'')),
+      r.bagsPerCase||'', r.lot||'',
       r.vals[0]||'', r.vals[1]||'', r.vals[2]||'', r.vals[3]||'', r.vals[4]||'',
-      parseFloat(r.avg).toFixed(3), r.total, (r.pass==null?'—':r.pass), compLabel(r.compliance),
+      (r.avg!=null?parseFloat(r.avg).toFixed(3):''), (r.issue?'':r.total), (r.pass==null?'—':r.pass), compLabel(r.compliance),
       r.initials||'', r.comments||''
     ];
   });
@@ -135,7 +137,7 @@ function exportGmpExcel() {
 
 function exportDashExcel() {
   var db   = getDB();
-  var w    = filterByDays(db.weights);
+  var w    = filterByDays(db.weights).filter(function(r){ return !r.issue; });  // issues fuera del Dashboard
   var gmps = filterByDays(db.gmps);
   var seals = filterByDays(db.seals);
   var periodLabel = dashDays ? 'Last '+dashDays+' days' : 'All Time';
@@ -150,9 +152,11 @@ function exportDashExcel() {
     var dt = r.date ? new Date(r.date).toLocaleDateString('en-US') : '';
     return [
       dt, r.time||'', 'Line '+r.line, (r.shift===1?'1st':'2nd')+' Shift',
-      r.pkgLabel, targetLabel(r), r.product||'', r.productName||'', r.bagsPerCase||'', r.lot||'',
+      r.pkgLabel, targetLabel(r), r.product||'',
+      (r.issue && WEIGHT_ISSUES[r.issue] ? WEIGHT_ISSUES[r.issue].label : (r.productName||'')),
+      r.bagsPerCase||'', r.lot||'',
       r.vals[0]||'', r.vals[1]||'', r.vals[2]||'', r.vals[3]||'', r.vals[4]||'',
-      parseFloat(r.avg).toFixed(3), r.total, (r.pass==null?'—':r.pass), compLabel(r.compliance),
+      (r.avg!=null?parseFloat(r.avg).toFixed(3):''), (r.issue?'':r.total), (r.pass==null?'—':r.pass), compLabel(r.compliance),
       r.initials||'', r.comments||''
     ];
   });

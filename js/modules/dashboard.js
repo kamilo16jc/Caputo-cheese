@@ -38,6 +38,7 @@ function dashInRange(iso){
 
 // Filtro común para pesos y sellos
 function dashKeep(r){
+  if(r.issue) return false;   // los issues de línea no van al Dashboard
   if(!dashInRange(r.date)) return false;
   if(dashF.line!=='all'  && String(r.line||'')  !== dashF.line)  return false;
   if(dashF.shift!=='all' && String(r.shift||'') !== dashF.shift) return false;
